@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS food;
+
+CREATE TABLE food (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  image_url VARCHAR(200),
+  price INTEGER NOT NULL
+);

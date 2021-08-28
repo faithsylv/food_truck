@@ -1,0 +1,7 @@
+{% block page_content %}
+<h1> MENU </h1>
+    {% for item in food_items %}
+        <h3> {{ item[1] }} {{ item[2] }} </h3>
+    {% endfor %}
+
+{% endblock%}
