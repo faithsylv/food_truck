@@ -1,7 +1,8 @@
+{% extends "base.jinja" %}
 {% block page_content %}
 <h1> MENU </h1>
-    {% for item in food_items %}
-        <h3> {{ item[1] }} {{ item[2] }} </h3>
+    {% for food in food_items %}
+        <a href=/edit_food?id={{food.id}}><h3> {{ food.name }} {{ food.price }} </h3></a>
     {% endfor %}
 
 {% endblock%}

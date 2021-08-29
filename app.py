@@ -11,18 +11,25 @@ def home():
 def index():
     conn = psycopg2.connect("dbname=food_truck")
     cur = conn.cursor()
-    cur.execute("SELECT id, name, price from food")
+    cur.execute("SELECT * from food")
     results = cur.fetchall()
-    print(results)
+    print('the results are', results)
     food_items = []
     for row in results:
-        food_id = row[0]
-        name = row[1]
-        price = f'${row[2]:.2f}'
-        food_items.append([food_id, name, price])
+        food_item = {
+            'id': row[0],
+            'name': row[1],
+            'image': row[2],
+            'price': f'${float(row[3]):.2f}',
+        }
+        food_items.append(food_item)
     cur.close()
     conn.close()
     return render_template('menu.jinja', food_items=food_items)
+
+@app.route('/add_food')
+def add():
+    return render_template('add_food.jinja')
 
 @app.route('/add_food', methods=["POST"])
 def addpost():
@@ -41,5 +48,9 @@ def addpost():
   conn.close()
   # Show without redirect first
   return redirect('/menu')
+
+@app.route('/edit_food')
+def update():
+    
 
 app.run(debug=True)

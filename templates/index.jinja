@@ -1,16 +1,4 @@
 {% extends "base.jinja" %}
 {% block page_content %}
     <h1>Home Page</h1>
-
-     <form action='/add_food' method='post'>
-        <label for="name">Food Name:</label><br>
-        <input type="text" id="name" name="name"><br>
-        
-        <label for="image_url">Image:</label><br>
-        <input type="text" id="image_url" name="image_url"><br>
-
-        <label for="price">Price:</label><br>
-        <input type="text" id="price" name="price"><br>
-        <input type='submit' value="Add items">
-    </form> 
 {% endblock %}
