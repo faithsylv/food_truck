@@ -49,8 +49,5 @@ def addpost():
   # Show without redirect first
   return redirect('/menu')
 
-@app.route('/edit_food')
-def update():
-    
 
 app.run(debug=True)
