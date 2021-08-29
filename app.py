@@ -1,4 +1,5 @@
 import psycopg2
+from database import DB_URL
 from flask import Flask, request, redirect, render_template
 
 app = Flask(__name__)
@@ -9,7 +10,7 @@ def home():
 
 @app.route('/menu')
 def index():
-    conn = psycopg2.connect("dbname=food_truck")
+    conn = psycopg2.connect(DB_URL)
     cur = conn.cursor()
     cur.execute("SELECT * from food")
     results = cur.fetchall()
@@ -36,7 +37,7 @@ def addpost():
   # Inspect the request data
   print(request.form)
 
-  conn = psycopg2.connect("dbname=food_truck")
+  conn = psycopg2.connect(DB_URL)
   cur = conn.cursor()
   name = request.form.get('name')
   # Will have to convert price to whatever format you chose for the DB
