@@ -1,0 +1,16 @@
+{% extends 'base.jinja'%}
+
+{% block page_content%}
+
+<h1>LOGIN PAGE</h1>
+<form action='/login' method='post'>
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name"><br>
+    
+    <label for="image_url">Email:</label><br>
+    <input type="text" id="email" name="email"><br>
+
+    <input type='submit' value="Sign In">
+</form> 
+
+{% endblock%}

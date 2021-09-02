@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/Users/faithsylvia/projects/seifxr05/foodtruck/venv"
+VIRTUAL_ENV="/Users/faithsylv/code/self-learning/food_truck/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

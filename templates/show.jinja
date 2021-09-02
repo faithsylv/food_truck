@@ -1,4 +1,10 @@
 {% extends "base.jinja" %}
 {% block page_content %}
 
+<h1>{{ food_item.name }}
+
+<img src={{ food_item.image }}> 
+
+<a href='/edit_food?id={{ food_item.id }}'>EDIT FOOD</a>
+
 {% endblock %}

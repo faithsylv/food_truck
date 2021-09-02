@@ -2,7 +2,7 @@
 {% block page_content %}
 <h1> MENU </h1>
     {% for food in food_items %}
-        <a href=/edit_food?id={{food.id}}><h3> {{ food.name }} {{ food.price }} </h3></a>
+        <a href=/show_food?id={{food.id}}><h3> {{ food.name }} {{ food.price }} </h3></a>
     {% endfor %}
 
 {% endblock%}
