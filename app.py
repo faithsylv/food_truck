@@ -1,20 +1,16 @@
-from database import sql_fetch, sql_write, DB_URL
 import re
 from flask import Flask, request, redirect, render_template, session
-import psycopg2
-import os
+
+from database import sql_fetch, sql_fetch_one, sql_write
+from models import menu, user, reviews
+
+import bcrypt
+
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'myfakesecretkey'
 
 dbname = 'foodtruck'
-
-def get_user_name():
-  if 'user_id' in session:
-    user_id = session['user_id']
-    results = sql_fetch('SELECT name FROM users WHERE id = %s', [user_id])
-    name = results[0][0]
-    return name
-  return ''
 
 @app.route('/')
 def home():
@@ -22,117 +18,85 @@ def home():
 
 @app.route('/menu')
 def index():
-    conn = psycopg2.connect(DB_URL)
-    cur = conn.cursor()
-    cur.execute("SELECT * from food")
-    results = cur.fetchall()
-    print(f'the results are {results}')
-    food_items = []
-    for row in results:
-        food_item = {
-            'id': row[0],
-            'name': row[1],
-            'image': row[2],
-            'price': f'${float(row[3]):.2f}',
-        }
-        food_items.append(food_item)
-    cur.close()
-    conn.close()
-    return render_template('menu.jinja', food_items=food_items)
+    name = user.get_user_name()
+    food_items = menu.get_all_food()
+    user_reviews = reviews.get_all_reviews()
+    print(user_reviews)
+    return render_template('menu.jinja', food_items=food_items, name=name, user_reviews=user_reviews)
 
 @app.route('/show_food')
 def show():
-    conn = psycopg2.connect(f"dbname={dbname}")
-    cur = conn.cursor()
-
+    name = user.get_user_name()
     item_id = request.args.get('id')
-    cur.execute("SELECT * FROM food WHERE id=%s", [item_id])
-    results = cur.fetchone()
+    food_item = menu.get_food_item(item_id)
     
-    food_item = {
-        'id': results[0],
-        'name': results[1],
-        'image': results[2],
-        'price': f'${float(results[3]):.2f}'
-    }
-
-    print(food_item['image'])
-
-    cur.close()
-    conn.close()
-
-    return render_template('show.jinja', food_item = food_item)
+    return render_template('show.jinja', food_item = food_item, name=name)
 
 @app.route('/add_food')
 def add():
-    return render_template('add_food.jinja')
+  name = user.get_user_name()
+  if name:
+    return render_template('add_food.jinja', name=name)
+  else: 
+    return redirect('/login')
+
 
 @app.route('/add_food', methods=["POST"])
 def addpost():
-  # Inspect the request data
-  print(request.form)
+  if user.get_user_name():
+    name = request.form.get('name')
+    price = float(request.form.get('price'))
+    image_url = request.form.get('image_url')
 
-  conn = psycopg2.connect(DB_URL)
-  cur = conn.cursor()
-  name = request.form.get('name')
-  # Will have to convert price to whatever format you chose for the DB
-  price = float(request.form.get('price'))
-  image_url = request.form.get('image_url')
-  cur.execute("INSERT INTO food(name, image_url, price) VALUES (%s, %s, %s)", [name, image_url, price])
-  conn.commit() # Don't forget this, or it won't save.
-  cur.close()
-  conn.close()
-  # Show without redirect first
+    menu.insert_food(name, price, image_url)
+
   return redirect('/menu')
 
 @app.route('/edit_food')
 def update():
-    conn = psycopg2.connect(f"dbname={dbname}")
-    cur = conn.cursor()
-
-    item_id = request.args.get('id')
-    cur.execute("SELECT * FROM food WHERE id=%s", [item_id])
-    results = cur.fetchone()
-    
-    food_item = {
-        'id': results[0],
-        'name': results[1],
-        'image': results[2],
-        'price': f'${float(results[3]):.2f}'
-    }
-
-    print(food_item['image'])
-
-    cur.close()
-    conn.close()
-    return render_template("edit_food.jinja", food_item = food_item)
+    name = user.get_user_name()
+    if name:
+      item_id = request.args.get('id')
+      food_item = menu.get_food_item(item_id)
+      return render_template("edit_food.jinja", food_item = food_item, name=name)
+    else:
+      return render_template("login.jinja")
 
 @app.route('/edit_food', methods=["POST"])
 def editpost():
-    conn = psycopg2.connect(f"dbname={dbname}")
-    cur = conn.cursor()
-    item_id = request.args.get('id')
-    print('okay the id is', item_id)
-    name = request.form.get('name')
-    price = float(request.form.get('price'))
-    image_url = request.form.get('image_url')
-    cur.execute("UPDATE food SET name=%s, image_url=%s, price=%s WHERE id=%s", [name, image_url, price, item_id])
-    conn.commit() # Don't forget this, or it won't save.
-    cur.close()
-    conn.close()
-    # Show without redirect first
-    return redirect(f'/show_food?id={item_id}')
+    if user.get_user_name():
+      item_id = request.args.get('id')
+      name = request.form.get('name')
+      price = float(request.form.get('price'))
+      image_url = request.form.get('image_url')
+      
+      sql_write("UPDATE food SET name=%s, image_url=%s, price=%s WHERE id=%s", [name, image_url, price, item_id])
+
+      return redirect(f'/show_food?id={item_id}')
+    else:
+      return redirect('/login')
+
+@app.route('/delete_food', methods=["GET","POST"])
+def delete():
+    if user.get_user_name():
+      item_id = request.args.get('id')
+      menu.delete_food(item_id)
+
+    return redirect(f'/menu')
 
 @app.route('/signup')
 def signup_form():
-  return render_template('signup.jinja', user_name=get_user_name())
+  return render_template('signup.jinja')
 
 @app.route('/signup', methods=['POST'])
 def signup_action():
   email = request.form.get('email')
   name = request.form.get('name')
+  password = request.form.get('password')
+  print(password)
+  pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
   sql_write("INSERT INTO users (email, name, password_hash) VALUES (%s, %s, %s)", [email, name, pw_hash])
-  return redirect('/')
+  return redirect('/login')
 
 
 @app.route('/login')
@@ -140,11 +104,31 @@ def login():
     return render_template("login.jinja")
 
 @app.route('/login', methods=["POST"])
-def login():
+def loginpost():
+    email = request.form.get('email')
+    password = request.form.get('password')
 
+    current_user = user.get_user(email)
+    if current_user:
+      password_hash = current_user[3]
+      valid = bcrypt.checkpw(password.encode(), password_hash.encode())
 
+    if current_user and valid:
+      session['user_id'] = current_user[0]
+      session['user_email'] = current_user[1]
+      session['username'] = current_user[2]
+      return redirect('/menu')
+    elif not current_user:
+      print('user does not exist')
+      return redirect('/login')
+    elif not valid:
+      print('password incorrect')
+      return redirect('/login')
 
-    return redirect("/")
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/menu')
 
 
 # if __name__ == 'main':

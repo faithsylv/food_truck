@@ -1,6 +1,7 @@
 {% extends 'base.jinja'%}
 
 {% block page_content%}
+
 <form action='/edit_food?id={{ food_item.id }}' method='post'>
     <label for="name">Food Name:</label><br>
     <input type="text" id="name" name="name" value = {{ food_item.name }} ><br>
