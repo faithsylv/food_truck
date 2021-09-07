@@ -11,7 +11,7 @@ CREATE TABLE reviews (
   id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL,
   content TEXT, 
-  rating INTEGER NOT NULL
+  rating INTEGER
 );
 
 

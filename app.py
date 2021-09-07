@@ -20,7 +20,7 @@ def home():
 def index():
     name = user.get_user_name()
     food_items = menu.get_all_food()
-    user_reviews = reviews.get_all_reviews()
+    user_reviews = reviews.get_all()
     print(user_reviews)
     return render_template('menu.jinja', food_items=food_items, name=name, user_reviews=user_reviews)
 
@@ -78,11 +78,21 @@ def editpost():
 
 @app.route('/delete_food', methods=["GET","POST"])
 def delete():
-    if user.get_user_name():
-      item_id = request.args.get('id')
-      menu.delete_food(item_id)
+  if user.get_user_name():
+    item_id = request.args.get('id')
+    menu.delete_food(item_id)
 
-    return redirect(f'/menu')
+  return redirect('/menu')
+  
+@app.route('/add_review', methods=["POST"])
+def add_review():
+  if user.get_user_name:
+    user_id = session['user_id']
+    content = request.form.get('review')
+    reviews.add(user_id, content)
+    return redirect('/menu')
+  else:
+    return redirect('/login')
 
 @app.route('/signup')
 def signup_form():

@@ -7,11 +7,22 @@
         <a href=/show_food?id={{food.id}}><h3> {{ food.name }} {{ food.price }} </h3></a>
     {% endfor %}
 
+
+    {% if name %}
+        <form action='/add_review' method='post'>
+            <label for="review">Add your review:</label><br>
+            <input type="text" id="review" name="review"><br>
+            <input type='submit' value="Add items">
+        </form> 
+        
+    {% endif %}
+
     <h2>REVIEWS</h2>
 
     {% for review in user_reviews %}
         <p>{{ review.content }}</p>
         <p>{{ review.rating }} stars </p>
+        <p>{{ review.user_name }} </p>
     {% endfor %}
 
 
