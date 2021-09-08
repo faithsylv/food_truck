@@ -1,4 +1,5 @@
 import re
+import os
 from flask import Flask, request, redirect, render_template, session
 
 from database import sql_fetch, sql_fetch_one, sql_write
@@ -6,9 +7,10 @@ from models import menu, user, reviews
 
 import bcrypt
 
+SECRET_KEY = os.environ.get("SECRET_KEY", "pretend key for testing only")
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'myfakesecretkey'
+app.config['SECRET_KEY'] = SECRET_KEY
 
 @app.route('/')
 def home():
