@@ -10,8 +10,6 @@ import bcrypt
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'myfakesecretkey'
 
-dbname = 'foodtruck'
-
 @app.route('/')
 def home():
     return render_template('index.jinja')
@@ -141,5 +139,5 @@ def logout():
     return redirect('/menu')
 
 
-# if __name__ == 'main':
-app.run(debug=True)
+if __name__ == 'main':
+  app.run(debug=True)
