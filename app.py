@@ -29,6 +29,8 @@ def show():
     name = user.get_user_name()
     item_id = request.args.get('id')
     food_item = menu.get_food_item(item_id)
+
+    print(food_item)
     
     return render_template('show.jinja', food_item = food_item, name=name)
 
@@ -67,10 +69,12 @@ def editpost():
     if user.get_user_name():
       item_id = request.args.get('id')
       name = request.form.get('name')
-      price = float(request.form.get('price'))
       image_url = request.form.get('image_url')
-      
-      sql_write("UPDATE food SET name=%s, image_url=%s, price=%s WHERE id=%s", [name, image_url, price, item_id])
+      print(re.match('\d+', request.form.get('price')))
+
+      price = float(re.findall('\d+', request.form.get('price'))[0])
+
+      menu.update_food(item_id, name, image_url, price)
 
       return redirect(f'/show_food?id={item_id}')
     else:
@@ -141,5 +145,4 @@ def logout():
     return redirect('/menu')
 
 
-if __name__ == 'main':
-  app.run(debug=True)
+app.run(debug=True)

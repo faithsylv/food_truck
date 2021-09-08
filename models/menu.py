@@ -30,8 +30,8 @@ def get_food_item(item_id):
 def insert_food(name, price, image_url):
     sql_write("INSERT INTO food(name, image_url, price) VALUES (%s, %s, %s)", [name, image_url, price])
 
-
 def update_food(item_id, name, image_url, price):
+    print('the image url is', image_url)
     sql_write("UPDATE food SET name=%s, image_url=%s, price=%s WHERE id=%s", [name, image_url, price, item_id])
 
 def delete_food(item_id):

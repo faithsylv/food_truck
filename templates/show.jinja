@@ -5,6 +5,8 @@
 
 <img src={{ food_item.image }}> 
 
+<p>{{ food_item.price }}
+
 {% if name %}
     <a href='/edit_food?id={{ food_item.id }}'>EDIT FOOD</a>
     <a href='/delete_food?id={{ food_item.id }}'>DELETE FOOD</a>
