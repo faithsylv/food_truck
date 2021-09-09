@@ -47,7 +47,7 @@ def add():
 def addpost():
   if user.get_user_name():
     name = request.form.get('name')
-    price = float(request.form.get('price'))
+    price = float(re.findall('\d+', request.form.get('price'))[0])    
     image_url = request.form.get('image_url')
 
     menu.insert_food(name, price, image_url)
@@ -70,8 +70,6 @@ def editpost():
       item_id = request.args.get('id')
       name = request.form.get('name')
       image_url = request.form.get('image_url')
-      print(re.match('\d+', request.form.get('price')))
-
       price = float(re.findall('\d+', request.form.get('price'))[0])
 
       menu.update_food(item_id, name, image_url, price)
